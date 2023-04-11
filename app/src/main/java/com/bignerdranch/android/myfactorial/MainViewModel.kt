@@ -24,9 +24,7 @@ class MainViewModel : ViewModel() {
 //            calculate
             delay(5000)
             _state.value = Resulting(number.toString())
-
         }
-
     }
 
 }
