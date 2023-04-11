@@ -30,24 +30,21 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun observe() {
+        viewModel.state.observe(this) {
 
-        viewModel.progress.observe(this) {
-          if (it){
-              binding.progressBar.visibility = View.VISIBLE
-              binding.button.isEnabled = false
-          } else{
-              binding.progressBar.visibility = View.GONE
-              binding.button.isEnabled = true
-          }
-        }
-        viewModel.error.observe(this){
-            if (it){
+            if (it.isError) {
                 Toast.makeText(
-                    this,"Input empty",Toast.LENGTH_SHORT).show()
+                    this, "Input empty", Toast.LENGTH_SHORT
+                ).show()
             }
-        }
-        viewModel.factorial.observe(this){
-            binding.tvFactorial.text = it
+            if (it.isInProgress) {
+                binding.progressBar.visibility = View.VISIBLE
+                binding.button.isEnabled = false
+            } else {
+                binding.progressBar.visibility = View.GONE
+                binding.button.isEnabled = true
+            }
+            binding.tvFactorial.text = it.isFactorial
         }
 
     }
