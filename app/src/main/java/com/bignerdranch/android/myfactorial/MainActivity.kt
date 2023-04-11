@@ -1,6 +1,6 @@
 package com.bignerdranch.android.myfactorial
 
-import android.opengl.Visibility
+
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
@@ -29,23 +29,25 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun observe() {
+    private fun observe() {
         viewModel.state.observe(this) {
+            binding.progressBar.visibility = View.GONE
+            binding.button.isEnabled = true
 
-            if (it.isError) {
-                Toast.makeText(
-                    this, "Input empty", Toast.LENGTH_SHORT
-                ).show()
+            when (it) {
+                is Error -> {
+                    Toast.makeText(
+                        this, "Input empty", Toast.LENGTH_SHORT
+                    ).show()
+                }
+                is Progress -> {
+                    binding.progressBar.visibility = View.VISIBLE
+                    binding.button.isEnabled = false
+                }
+                is Resulting -> {
+                    binding.tvFactorial.text = it.factorial
+                }
             }
-            if (it.isInProgress) {
-                binding.progressBar.visibility = View.VISIBLE
-                binding.button.isEnabled = false
-            } else {
-                binding.progressBar.visibility = View.GONE
-                binding.button.isEnabled = true
-            }
-            binding.tvFactorial.text = it.isFactorial
         }
-
     }
 }
