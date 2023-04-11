@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">My Factorial</string>
+    <string name="text_button">Введите число</string>
 </resources>
