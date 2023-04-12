@@ -4,10 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import java.math.BigInteger
 import kotlin.concurrent.thread
 import kotlin.coroutines.suspendCoroutine
@@ -17,31 +14,47 @@ class MainViewModel : ViewModel() {
     val state: LiveData<State>
         get() = _state
 
-
+    private val myCoroutineScope = CoroutineScope(Dispatchers.Main +
+    CoroutineName("My coroutine"))
     fun calculate(number: String) {
         _state.value = Progress
         if (number.isNullOrEmpty()) {
             _state.value = Error
             return
         }
-        viewModelScope.launch {
+//       withContext(CoroutineName("MainCoroutine")){
+//
+//
+//        }
+
+        myCoroutineScope.launch {
             val calLong = number.toLong()
-            val result = factorial(calLong)
-//            delay(1000)
+            val result = withContext(Dispatchers.Default) {
+                factorial(calLong)
+            }
             _state.value = Resulting(result)
         }
-    }
+}
 
-    private suspend fun factorial(number: Long): String {
+private fun factorial(number: Long): String {
 
-      return withContext(Dispatchers.Default){
-           var result = BigInteger.ONE
-           for (i in 1..number) {
-               result = result.multiply(BigInteger.valueOf(i))
-           }
-          result.toString()
-       }
+    var result = BigInteger.ONE
+    for (i in 1..number) {
+        result = result.multiply(BigInteger.valueOf(i))
     }
+    return result.toString()
+}
+
+//    private suspend fun factorial(number: Long): String {
+//
+//      return withContext(Dispatchers.Default){
+//           var result = BigInteger.ONE
+//           for (i in 1..number) {
+//               result = result.multiply(BigInteger.valueOf(i))
+//           }
+//          result.toString()
+//       }
+//    }
 //    private suspend fun factorial(number: Long): BigInteger {
 //
 //        return suspendCoroutine {
@@ -54,4 +67,8 @@ class MainViewModel : ViewModel() {
 //            }
 //        }
 //    }
+    override fun onCleared() {
+        super.onCleared()
+    myCoroutineScope.cancel()
+    }
 }
